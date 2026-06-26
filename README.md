@@ -1,4 +1,4 @@
-# SENTINL 
-**Shrink-Expand Nexus of Trasmuted and Interconnected Node Lattices** 
+# SENTINEL 
+**Shrink-Expand Nexus of Transformed and Interconnected Nodes with Evolved Layers**
 
 
