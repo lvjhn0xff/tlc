@@ -1,12 +1,21 @@
-from core.cv_experiment import CrossValidationExperiment 
-from sklearn.datasets import load_iris
+from core.experiment.cv_experiment import CrossValidationExperiment 
+from sklearn.preprocessing import StandardScaler
 
-dataset = load_iris() 
-X = dataset.data 
-y = dataset.target
+from core.datasets.clf_2d import load_clf_2d
+from core.datasets.reg_2d import load_reg_2d
+
+from imblearn.pipeline import Pipeline
+from imblearn.over_sampling import SMOTE
+
+from sklearn.neighbors import KNeighborsClassifier
+
+X, y = load_clf_2d("moons") 
 
 def make_pipeline(fold_no, X_train, X_test):
-    pass
+    return Pipeline([
+        ("scaler", StandardScaler()),
+        ("model", KNeighborsClassifier())
+    ])
 
 experiment = CrossValidationExperiment(
     experiment_id = "Unnamed Experiment", 
