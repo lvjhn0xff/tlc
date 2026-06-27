@@ -9,7 +9,10 @@ from imblearn.over_sampling import SMOTE
 
 from sklearn.neighbors import KNeighborsClassifier
 
-X, y = load_clf_2d("moons") 
+experiment_type = "regression"
+
+# X, y = load_clf_2d("moons") 
+X, y = load_reg_2d("moons")
 
 def make_pipeline(fold_no, X_train, X_test):
     return Pipeline([
@@ -21,6 +24,7 @@ experiment = CrossValidationExperiment(
     experiment_id = "Unnamed Experiment", 
     X = X, 
     y = y, 
+    experiment_type=experiment_type,
     pipeline_fn = make_pipeline
 )
 
