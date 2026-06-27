@@ -1,7 +1,7 @@
 
 class Printing: 
     indent  = ""
-    verbose = False
+    verbose = True
 
     def set_indent(self, indent): 
         self.indent = indent 
@@ -10,4 +10,5 @@ class Printing:
         self.verbose = verbose
 
     def print(self, *args, **kwargs): 
-        print(self.indent + args[0], *args[1:], **kwargs)
+        if self.verbose == True:
+            print(self.indent + args[0], *args[1:], **kwargs)

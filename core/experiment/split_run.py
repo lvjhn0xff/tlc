@@ -4,6 +4,7 @@ import time
 from collections import Counter
 import numpy as np 
 from utils.percentiles import percentiles
+from .performance import Performance
 
 class SplitRun(Printing): 
     def __init__(
@@ -106,7 +107,6 @@ class SplitRun(Printing):
                 f"Unknown experiment type {self.context.experiment_type}."
             )
 
-
     def train(self): 
         self.print(f"> Calling .fit() on pipeline.") 
         start = time.time() 
@@ -151,6 +151,12 @@ class SplitRun(Printing):
         ) 
 
     def evaluate(self): 
-        pass 
-    
-     
+        print(f"> Evaluating run.") 
+
+        print(f"> Evaluating on train set.") 
+        train_performance = Performance(self.X_train)
+        train_performance.compute()
+
+        print(f"> Evaluating on test set.")
+        test_performance = Performance(self.X_test) 
+        test_performance.compute()
