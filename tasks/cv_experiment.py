@@ -7,17 +7,17 @@ from core.datasets.reg_2d import load_reg_2d
 from imblearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
 
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsRegressor
 
 experiment_type = "regression"
 
-X, y = load_clf_2d("moons") 
-# X, y = load_reg_2d("moons")
+# X, y = load_clf_2d("moons") 
+X, y = load_reg_2d("moons")
 
 def make_pipeline(fold_no, X_train, X_test):
     return Pipeline([
         ("scaler", StandardScaler()),
-        ("model", KNeighborsClassifier())
+        ("model", KNeighborsRegressor())
     ])
 
 experiment = CrossValidationExperiment(

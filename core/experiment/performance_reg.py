@@ -1,5 +1,6 @@
 from utils.printing import Printing
 from sklearn.metrics import *
+import numpy as np
 
 class RegressionPerformance(Printing): 
     def __init__(
@@ -23,6 +24,7 @@ class RegressionPerformance(Printing):
         self.y = y 
         self.y_hat = y_hat 
         self.y_proba = y_proba
+        self.residuals = np.abs(self.y_hat - self.y)
 
     def compute(self): 
         self.print(f"> Computing performance.")
