@@ -1,7 +1,21 @@
 from utils.printing import Printing
 from sklearn.metrics import *
+from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.utils.class_weight import compute_sample_weight
 from utils.display import display_confusion_matrix
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import label_binarize
+from sklearn.metrics import (
+    ConfusionMatrixDisplay,
+    PrecisionRecallDisplay,
+    RocCurveDisplay,
+    precision_recall_curve,
+    roc_curve,
+)
+from matplotlib.colors import ListedColormap
+
+import numpy as np
+
 
 import pandas as pd
 
@@ -51,7 +65,14 @@ class ClassificationPerformance(Printing):
         self.compute_log_loss() 
         self.generate_confusion_matrix() 
         self.generate_pr_auc_plot() 
-        self.generate_roc_auc_plot() 
+        self.generate_roc_auc_plot()
+
+        self.generate_decision_boundary_display(
+            self.split_run.X_train, self.split_run.y_train
+        ) 
+        self.generate_decision_boundary_display(
+            self.split_run.X_test, self.split_run.y_test
+        ) 
 
     def per_class_scores(self, scoring, y, y_hat): 
         results = {} 
@@ -472,9 +493,152 @@ class ClassificationPerformance(Printing):
         labels = self.split_run.experiment.classes
         display_confusion_matrix(cm, labels, prefix=self.indent + "\t")
 
-    def generate_pr_auc_plot(self): 
-        self.print("> Computing PR-AUC Plot")
+        fig, ax = plt.subplots(figsize=(6, 6))
 
-    def generate_roc_auc_plot(self): 
-        self.print("> Generating ROC-AUC Plot")
+        disp = ConfusionMatrixDisplay(
+            confusion_matrix=cm,
+            display_labels=self.split_run.experiment.classes
+        )
+        disp.plot(ax=ax, colorbar=False)
 
+        ax.set_title("Confusion Matrix")
+        fig.tight_layout()
+
+        self.confusion_matrix_plot = (fig, ax)
+
+        display_confusion_matrix(
+            cm,
+            self.split_run.experiment.classes,
+            prefix=self.indent + "\t"
+        )
+
+        plt.show()
+
+
+    def generate_pr_auc_plot(self):
+        self.print("> Generating PR-AUC Plot.")
+
+        fig, ax = plt.subplots(figsize=(6, 6))
+
+        classes = self.split_run.experiment.classes
+
+        if len(classes) == 2:
+
+            proba = self.y_proba[:, 1] if self.y_proba.ndim == 2 else self.y_proba
+
+            PrecisionRecallDisplay.from_predictions(
+                self.y,
+                proba,
+                ax=ax,
+                name=str(classes[1])
+            )
+
+        else:
+
+            y_bin = label_binarize(self.y, classes=classes)
+
+            for i, cls in enumerate(classes):
+                PrecisionRecallDisplay.from_predictions(
+                    y_bin[:, i],
+                    self.y_proba[:, i],
+                    ax=ax,
+                    name=str(cls)
+                )
+
+        ax.set_title("Precision-Recall Curve")
+        fig.tight_layout()
+
+        plt.show()
+
+
+        self.pr_auc_plot = (fig, ax)
+
+    def generate_roc_auc_plot(self):
+        self.print("> Generating ROC-AUC Plot.")
+
+        fig, ax = plt.subplots(figsize=(6, 6))
+
+        classes = self.split_run.experiment.classes
+
+        if len(classes) == 2:
+
+            proba = self.y_proba[:, 1] if self.y_proba.ndim == 2 else self.y_proba
+
+            RocCurveDisplay.from_predictions(
+                self.y,
+                proba,
+                ax=ax,
+                name=str(classes[1])
+            )
+
+        else:
+
+            y_bin = label_binarize(self.y, classes=classes)
+
+            for i, cls in enumerate(classes):
+                RocCurveDisplay.from_predictions(
+                    y_bin[:, i],
+                    self.y_proba[:, i],
+                    ax=ax,
+                    name=str(cls)
+                )
+
+        ax.set_title("ROC Curve")
+        fig.tight_layout()
+
+        plt.show()
+
+
+        self.roc_auc_plot = (fig, ax)
+
+    def generate_decision_boundary_display(self, X, y):
+        self.print("> Generating Decision Boundary Display.")
+
+        estimator = self.split_run.pipeline
+
+        if isinstance(X, pd.DataFrame):
+            feature_names = X.columns.tolist()
+            X_plot = X.to_numpy()
+        else:
+            X_plot = np.asarray(X)
+            feature_names = ["Feature 1", "Feature 2"]
+
+        y = np.asarray(y)
+
+        if X_plot.shape[1] != 2:
+            self.print("\t:: Skipping Decision Boundary (requires exactly 2 features).")
+            return
+
+        fig, ax = plt.subplots(figsize=(6, 6))
+
+        DecisionBoundaryDisplay.from_estimator(
+            estimator,
+            X,
+            response_method="predict",
+            alpha=0.30,
+            ax=ax,
+        )
+
+        scatter = ax.scatter(
+            X_plot[:, 0],
+            X_plot[:, 1],
+            c=y,
+            edgecolors="k",
+            s=40,
+        )
+
+        ax.set_xlabel(feature_names[0])
+        ax.set_ylabel(feature_names[1])
+        ax.set_title("Decision Boundary")
+
+        ax.legend(
+            *scatter.legend_elements(),
+            title="Class",
+            loc="best"
+        )
+
+        fig.tight_layout()
+
+        self.decision_boundary_plot = (fig, ax)
+
+        plt.show()

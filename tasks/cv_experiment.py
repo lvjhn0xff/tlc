@@ -7,17 +7,17 @@ from core.datasets.reg_2d import load_reg_2d
 from imblearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
 
-from sklearn.neighbors import KNeighborsRegressor
+from sklearn.neural_network import MLPClassifier
 
-experiment_type = "regression"
+experiment_type = "classification"
 
-# X, y = load_clf_2d("moons") 
-X, y = load_reg_2d("moons")
+X, y = load_clf_2d("moons") 
+# X, y = load_reg_2d("moons")
 
 def make_pipeline(fold_no, X_train, X_test):
     return Pipeline([
         ("scaler", StandardScaler()),
-        ("model", KNeighborsRegressor())
+        ("model", MLPClassifier((10, 10), activation="relu"))
     ])
 
 experiment = CrossValidationExperiment(

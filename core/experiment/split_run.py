@@ -46,9 +46,6 @@ class SplitRun(Printing):
         self.y_train = y_train
         self.y_test = y_test 
 
-        # Options 
-        self.plot_decision_boundary = plot_decision_boundary
-
         # Evaluation 
         self.performance = None 
         
@@ -131,6 +128,27 @@ class SplitRun(Printing):
         end = time.time() 
         self.predict_test_time = end - start  
         self.print(f"> Predicted on X_test in {self.predict_test_time:.4f} seconds.") 
+    
+        if hasattr(self.pipeline, "predict_proba"):
+            self.print(f"> Calling .predict_proba() on X_train")
+            start = time.time() 
+            self.predict_proba_train = self.pipeline.predict_proba(self.X_train)
+            end = time.time() 
+            self.predict_proba_train_time = end - start
+            self.print(
+                f"> Predicted probabilities on X_train" 
+                f" in {self.predict_train_time:.4f} seconds."
+            ) 
+
+            self.print(f"> Calling .predict_proba() on X_test")
+            start = time.time() 
+            self.predict_proba_test = self.pipeline.predict_proba(self.X_test) 
+            end = time.time() 
+            self.predict_proba_test_time = end - start  
+            self.print(
+                f"> Predicted probabilities on X_test"
+                f" in {self.predict_test_time:.4f} seconds."
+            ) 
 
     def evaluate(self): 
         self.print(f"> Evaluating run.") 
