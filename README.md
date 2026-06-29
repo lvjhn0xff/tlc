@@ -1,3 +1,2 @@
-# TLC
-**Transmuted Latticed Complements**
-
+# LTCL 
+Layered Transmuted Complement Lattices
